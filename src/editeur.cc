@@ -25,7 +25,8 @@
 #include <windows.h>
 #endif
 
-#include <iostream.h>
+//#include <iostream.h>
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -374,7 +375,7 @@ void Editeur::PrendTouche(int Tou)
     
     // Sauve le niveau
     if(Niveau.Save()==false) {
-      cerr <<"ERREUR Saving levels!"<<endl;
+      std::cerr <<"ERREUR Saving levels!";
       exit(-1);
     }
     

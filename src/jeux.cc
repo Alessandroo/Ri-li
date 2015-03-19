@@ -25,7 +25,8 @@
 #include <windows.h>
 #endif
 
-#include <iostream.h>
+//#include <iostream.h>
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,6 +38,7 @@
 #include "menu.h"
 #include "tableau.h"
 #include "audio.h"
+#include "main.h"
 
 /*** Variables globales ***/
 /**************************/
@@ -83,7 +85,7 @@ eMenu Jeux::SDLMain(void)
   Help=true;
   Load(NumN); // Charge le tableau
   Ec[NumVideo].Cls(fjeu);
-  SDL_Flip(sdlVideo);
+  my_SDL_Flip(sdlVideo);
   NumVideo=(NumVideo+1)&1;
   Ec[NumVideo].Cls(fjeu);
   Pause=true;
@@ -104,7 +106,7 @@ eMenu Jeux::SDLMain(void)
       case SDL_ACTIVEEVENT:
 	if(event.active.gain==1) {
 	  Ec[NumVideo].Cls(fjeu);
-	  SDL_Flip(sdlVideo);
+	  my_SDL_Flip(sdlVideo);
 	  NumVideo=(NumVideo+1)&1;
 	  Ec[NumVideo].Cls(fjeu);
 	}
@@ -122,7 +124,7 @@ eMenu Jeux::SDLMain(void)
 	    if(mRet==mJeux) {
 	      DrawLevel(NumN);
 	      Ec[NumVideo].Cls(fjeu);
-	      SDL_Flip(sdlVideo);
+	      my_SDL_Flip(sdlVideo);
 	      NumVideo=(NumVideo+1)&1;
 	      Ec[NumVideo].Cls(fjeu);
 	      Pause=true;
@@ -186,7 +188,7 @@ eMenu Jeux::SDLMain(void)
     
     // Fait l'affichage
     AfficheEcran();
-    SDL_Flip(sdlVideo);
+    my_SDL_Flip(sdlVideo);
 
     NumVideo=(NumVideo+1)&1;    
 
@@ -195,7 +197,9 @@ eMenu Jeux::SDLMain(void)
       if(Pref.NVie<0) return mScoreEdit; // Si mort fini
       if(Lo.Gagne) {
 #ifndef DCHILDREN
-	if(MenuPrincipale.SDLMain_HR()==mQuit) return mQuit;
+#ifndef GCWZERO
+        if(MenuPrincipale.SDLMain_HR()==mQuit) return mQuit;
+#endif
 #endif
 	NumN++;
 	if(Niveau.N==NumN) {
@@ -207,7 +211,7 @@ eMenu Jeux::SDLMain(void)
       Sons.NextMusic();
       Load(NumN);              // Recharge le tableau
       Ec[NumVideo].Cls(fjeu);
-      SDL_Flip(sdlVideo);
+      my_SDL_Flip(sdlVideo);
       NumVideo=(NumVideo+1)&1;
       Ec[NumVideo].Cls(fjeu);
       DureeJeu=0;

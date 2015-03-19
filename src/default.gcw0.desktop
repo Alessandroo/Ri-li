@@ -1,0 +1,11 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=Ri-Li
+Type=Application
+Exec=Ri_li
+Icon=Ri-li-icon-32x32
+Comment=Drive a toy wooden engine
+Terminal=false
+Categories=games;
+X-OD-Manual=readme.txt
+#X-OD-NeedsDownscaling=true

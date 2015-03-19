@@ -21,7 +21,8 @@
 //    with this program; if not, write to the Free Software Foundation, Inc.,
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#include <iostream.h>
+//#include <iostream.h>
+#include <iostream>
 #include <stdio.h>
 #include "mouse.h"
 #include "preference.h"
@@ -144,5 +145,7 @@ void Mouse::Affiche(int NumVideo)
   if(Y>=600-35) Y=600-36;
   
   // Affiche le curseur
+#ifndef GCWZERO
   Ec[NumVideo].Affiche(curseur,NumSp,X,Y);
+#endif
 }

@@ -21,7 +21,7 @@
 //    with this program; if not, write to the Free Software Foundation, Inc.,
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#include <iostream.h>
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,7 +31,7 @@
 #include "ecran.h"
 #include "mouse.h"
 #include "audio.h"
-
+#include "main.h"
 #define PY 180
 
 /*** Variables globales ***/
@@ -47,7 +47,10 @@ extern Audio Sons;
 
 static char Points[]=". . . . . . . . . . . . . .";
 static struct mPy Menu_Py[20];
-
+#ifdef GCWZERO
+const char alphabet[]=" ABCDEFGHIJKLMNOPQRSTUVQXYZ1234567890";
+static int mykey=0;
+#endif
 /*** Fait une attente pour 50fps ***/
 /***********************************/
 void Sleeping()
@@ -85,39 +88,39 @@ void AddBouton(int Num,e_Sprite NumSp,int X,int Y)
 
 /*** Change le vidéo ***/
 /***********************/
-void ChangeVideo(void)
-{
-  SDL_VideoInfo *sdlVideoInfo;
+//void ChangeVideo(void)
+//{
+//  SDL_VideoInfo *sdlVideoInfo;
 
   // Teste la resolution video
-  sdlVideoInfo=(SDL_VideoInfo*)SDL_GetVideoInfo();
-  if(sdlVideoInfo->vfmt->BitsPerPixel==8) {
-    cerr <<"Impossible d'utiliser 8bits pour la vidéo !"<<endl;
-    exit(-1);
-  }
-  
+//  sdlVideoInfo=(SDL_VideoInfo*)SDL_GetVideoInfo();
+//  if(sdlVideoInfo->vfmt->BitsPerPixel==8) {
+//    std::cerr <<"Impossible d'utiliser 8bits pour la vidéo !";
+//    exit(-1);
+//  }
+//  
   // Demande la resolution Video
-#ifndef LINUX
-  int vOption;
-  if(Pref.FullScreen)   vOption=SDL_SWSURFACE; // Bug accé aux bits pour les cordes
-  else  vOption=SDL_SWSURFACE|SDL_DOUBLEBUF;
-#else
-#ifndef __AMIGAOS4__
-  int vOption=SDL_SWSURFACE|SDL_DOUBLEBUF;
-#else
-  int vOption=SDL_SWSURFACE;
-#endif
-#endif
-
-  if(Pref.FullScreen) vOption|=SDL_FULLSCREEN;
-  sdlVideo=SDL_SetVideoMode(800,600,sdlVideoInfo->vfmt->BitsPerPixel,vOption);
-  if(sdlVideo==NULL) {
-    cerr <<"Impossible de passer dans le mode vidéo 800x600 !"<<endl;
-    exit(-1);
-  }
-  
-  SDL_ShowCursor(0); // Cache le curseur
-}
+//#ifndef LINUX
+//  int vOption;
+//  if(Pref.FullScreen)   vOption=SDL_SWSURFACE; // Bug accé aux bits pour les cordes
+//  else  vOption=SDL_SWSURFACE|SDL_DOUBLEBUF;
+//#else
+//#ifndef __AMIGAOS4__
+//  int vOption=SDL_SWSURFACE|SDL_DOUBLEBUF;
+//#else
+//  int vOption=SDL_SWSURFACE;
+//#endif
+//#endif
+//
+//  if(Pref.FullScreen) vOption|=SDL_FULLSCREEN;
+//  sdlVideo=SDL_SetVideoMode(640,480,sdlVideoInfo->vfmt->BitsPerPixel,vOption);
+//  if(sdlVideo==NULL) {
+//    std::cerr <<"Impossible de passer dans le mode vidéo 800x600 !";
+//    exit(-1);
+//  }
+//  
+//  SDL_ShowCursor(0); // Cache le curseur
+//}
 
 /*** SDL Main Menu principale ***/
 /********************************/
@@ -135,7 +138,9 @@ eMenu Menu::SDLMain(void)
   Sprites[fond_menu].Affiche(400,300,0,Sprites[fmenu].Image[0]);
   Sprites[menu].Affiche(400,340,0,Sprites[fmenu].Image[0]);
   Sprites[titre].Affiche(400,65,0,Sprites[fmenu].Image[0]);
+#ifndef GCWZERO
   Sprites[copyright].Affiche(400,587,0,Sprites[fmenu].Image[0]);
+#endif
 
   AfficheText(400,229,T_play,Sprites[fmenu].Image[0]);
   AddBouton(0,T_play,400,229);
@@ -150,7 +155,7 @@ eMenu Menu::SDLMain(void)
   // Efface le fond
   NumEc=0;
   Ec[1].Cls(fmenu);
-  SDL_Flip(sdlVideo);
+  my_SDL_Flip(sdlVideo);
   Ec[0].Cls(fmenu);
   
   // Prend les evenements
@@ -163,7 +168,7 @@ eMenu Menu::SDLMain(void)
 	if(event.active.gain==1) {
 	  NumEc=0;
 	  Ec[1].Cls(fmenu);
-	  SDL_Flip(sdlVideo);
+	  my_SDL_Flip(sdlVideo);
 	  Ec[0].Cls(fmenu);
 	}
 	break;
@@ -187,6 +192,7 @@ eMenu Menu::SDLMain(void)
 	  case ' ':
 	  case SDLK_RETURN:
 	  case SDLK_KP_ENTER:
+	  case SDLK_LCTRL:
 	    switch(PyE) {
 	    case 0:
 	      return mMenuNiveau;
@@ -225,7 +231,7 @@ eMenu Menu::SDLMain(void)
     Sourie.Affiche(NumEc);
     
     // Echange les buffets video
-    SDL_Flip(sdlVideo);
+    my_SDL_Flip(sdlVideo);
     NumEc=(NumEc+1)&1;
     
   } while(true);
@@ -271,7 +277,7 @@ eMenu Menu::SDLMain_Langue(void)
   // Efface le fond
   NumEc=0;
   Ec[1].Cls(fmenu);
-  SDL_Flip(sdlVideo);
+  my_SDL_Flip(sdlVideo);
   Ec[0].Cls(fmenu);
   
   // Prend les evenements
@@ -284,7 +290,7 @@ eMenu Menu::SDLMain_Langue(void)
 	if(event.active.gain==1) {
 	  NumEc=0;
 	  Ec[1].Cls(fmenu);
-	  SDL_Flip(sdlVideo);
+	  my_SDL_Flip(sdlVideo);
 	  Ec[0].Cls(fmenu);
 	}
 	break;
@@ -315,6 +321,7 @@ eMenu Menu::SDLMain_Langue(void)
 	  case ' ':
 	  case SDLK_RETURN:
 	  case SDLK_KP_ENTER:
+	  case SDLK_LCTRL:
 	    Pref.Langue=PyE;
 	    if(Pref.Langue!=OldLangue) LoadLangue();
 	    return mMenu;
@@ -340,11 +347,11 @@ eMenu Menu::SDLMain_Langue(void)
     Sourie.Affiche(NumEc);
 
     // Echange les buffets video
-    SDL_Flip(sdlVideo);
+    my_SDL_Flip(sdlVideo);
     NumEc=(NumEc+1)&1;
-    
+
   } while(true);
-  
+
   return mQuit;
 }
 
@@ -359,8 +366,9 @@ void Menu::InitMain_Options(void)
   // Prend l'image du fond et fait l'affichage 
   Sprites[fond_menu].Affiche(400,300,0,Sprites[fmenu].Image[0]);
   Sprites[gmenu].Affiche(400,300,0,Sprites[fmenu].Image[0]);
+#ifndef GCWZERO
   Sprites[keys].Affiche(610,455,0,Sprites[fmenu].Image[0]);
-
+#endif
   AddBouton(0,bruitage,140,110);
   AddBouton(1,music,160,200);
 
@@ -386,7 +394,7 @@ void Menu::InitMain_Options(void)
   Menu_Py[5].FinY=145;
   Menu_Py[5].Py=5;
   Menu_Py[5].Valide=true;
-  
+
   Menu_Py[6].DepX=476;
   Menu_Py[6].DepY=70;
   Menu_Py[6].FinX=720;
@@ -403,7 +411,7 @@ void Menu::InitMain_Options(void)
   Menu_Py[7].FinY=245;
   Menu_Py[7].Py=7;
   Menu_Py[7].Valide=true;
-  
+
   Menu_Py[8].DepX=476;
   Menu_Py[8].DepY=155;
   Menu_Py[8].FinX=720;
@@ -416,10 +424,10 @@ void Menu::InitMain_Options(void)
   // Efface le fond
   NumEc=0;
   Ec[1].Cls(fmenu);
-  SDL_Flip(sdlVideo);
+  my_SDL_Flip(sdlVideo);
   Ec[0].Cls(fmenu);
 }
-  
+
 /*** Gestion du menu Options ***/
 /*******************************/
 eMenu Menu::SDLMain_Options(void)
@@ -439,7 +447,7 @@ eMenu Menu::SDLMain_Options(void)
 	if(event.active.gain==1) {
 	  NumEc=0;
 	  Ec[1].Cls(fmenu);
-	  SDL_Flip(sdlVideo);
+	  my_SDL_Flip(sdlVideo);
 	  Ec[0].Cls(fmenu);
 	}
 	break;
@@ -452,12 +460,14 @@ eMenu Menu::SDLMain_Options(void)
 	  case SDLK_LEFT:
 	    switch(PyE) {
 	    case 2:
+# if 0 //ZX:
 	      if(Pref.FullScreen==false) {
 		Pref.FullScreen=true;
 		ChangeVideo();
 		InitMain_Options();
 		PyE=2;
 	      }
+# endif
 	      break;
 	    case 0:
 	    case 5: // Diminue volume sons
@@ -479,12 +489,14 @@ eMenu Menu::SDLMain_Options(void)
 	  case SDLK_RIGHT:
 	    switch(PyE) {
 	    case 2:
+# if 0 //ZX:
 	      if(Pref.FullScreen==true) {
 		Pref.FullScreen=false;
 		ChangeVideo();
 		InitMain_Options();
 		PyE=2;
 	      }
+# endif
 	      break;
 	    case 0:
 	    case 5:
@@ -513,19 +525,22 @@ eMenu Menu::SDLMain_Options(void)
 	    break;
 	  case SDLK_F12: // Sauve un screenshot
 	    SDL_SaveBMP(sdlVideo,"screenshot.bmp");
-	    break;    
+	    break;
 	  case ' ':
 	  case SDLK_RETURN:
 	  case SDLK_KP_ENTER:
+	  case SDLK_LCTRL:
 	    switch(PyE) {
 	    case 0:
 	    case 1:
 	      break;
 	    case 2: // Type d'affichage
+# if 0 //ZX:
 	      Pref.FullScreen=(Pref.FullScreen+1)&1;
 	      ChangeVideo();
 	      InitMain_Options();
 	      PyE=2;
+# endif
 	      break;
 	    case 3: // Choix de la langue
 	      SDLMain_Langue();
@@ -637,7 +652,7 @@ eMenu Menu::SDLMain_Options(void)
     Sourie.Affiche(NumEc);
     
     // Echange les buffets video
-    SDL_Flip(sdlVideo);
+    my_SDL_Flip(sdlVideo);
     NumEc=(NumEc+1)&1;
     
   } while(true);
@@ -669,7 +684,7 @@ eMenu Menu::SDLMain_Speed(void)
   // Efface le fond
   NumEc=0;
   Ec[1].Cls(fmenu);
-  SDL_Flip(sdlVideo);
+  my_SDL_Flip(sdlVideo);
   Ec[0].Cls(fmenu);
   
   // Prend les evenements
@@ -682,7 +697,7 @@ eMenu Menu::SDLMain_Speed(void)
 	if(event.active.gain==1) {
 	  NumEc=0;
 	  Ec[1].Cls(fmenu);
-	  SDL_Flip(sdlVideo);
+	  my_SDL_Flip(sdlVideo);
 	  Ec[0].Cls(fmenu);
 	}
 	break;
@@ -706,6 +721,7 @@ eMenu Menu::SDLMain_Speed(void)
 	  case ' ':
 	  case SDLK_RETURN:
 	  case SDLK_KP_ENTER:
+	  case SDLK_LCTRL:
 	    switch(PyE) {
 	    case 0:
 	      Pref.Difficulte=Easy;
@@ -738,7 +754,7 @@ eMenu Menu::SDLMain_Speed(void)
     Sourie.Affiche(NumEc);
     
     // Echange les buffets video
-    SDL_Flip(sdlVideo);
+    my_SDL_Flip(sdlVideo);
     NumEc=(NumEc+1)&1;
     
   } while(true);
@@ -778,7 +794,7 @@ eMenu Menu::SDLMain_Niveau(void)
   // Efface le fond
   NumEc=0;
   Ec[1].Cls(fmenu);
-  SDL_Flip(sdlVideo);
+  my_SDL_Flip(sdlVideo);
   Ec[0].Cls(fmenu);
   
   // Prend les evenements
@@ -791,7 +807,7 @@ eMenu Menu::SDLMain_Niveau(void)
 	if(event.active.gain==1) {
 	  NumEc=0;
 	  Ec[1].Cls(fmenu);
-	  SDL_Flip(sdlVideo);
+	  my_SDL_Flip(sdlVideo);
 	  Ec[0].Cls(fmenu);
 	}
 	break;
@@ -823,6 +839,7 @@ eMenu Menu::SDLMain_Niveau(void)
 	  case ' ':
 	  case SDLK_RETURN:
 	  case SDLK_KP_ENTER:
+	  case SDLK_LCTRL:
 	    switch(PyE) {
 	    case 0:
 	      return mMenuSpeed;
@@ -876,7 +893,7 @@ eMenu Menu::SDLMain_Niveau(void)
     Sourie.Affiche(NumEc);
     
     // Echange les buffets video
-    SDL_Flip(sdlVideo);
+    my_SDL_Flip(sdlVideo);
     NumEc=(NumEc+1)&1;
     
   } while(true);
@@ -912,7 +929,7 @@ eMenu Menu::SDLMain_HR(void)
   
   Sprites[menu].Affiche(340,300,0,Sprites[fmenu].Image[0]);
   Sprites[fond_hr].Affiche(340,74,0,Sprites[fmenu].Image[0]);
-  AfficheText(338,70,e_Sprite(T_question),Sprites[fmenu].Image[0]);
+  AfficheText(338,70,e_Sprite(T_question),Sprites[fmenu].Image[0]); //question is displayed, need to change font size or enlarge question
 
   Sprites[locomotive].Affiche(115,110,rand()%320,Sprites[fmenu].Image[0]);
   Sprites[deco].Affiche(100,160+(rand()%130),rand()%18,Sprites[fmenu].Image[0]);
@@ -940,7 +957,7 @@ eMenu Menu::SDLMain_HR(void)
   // Efface le fond
   NumEc=0;
   Ec[1].Cls(fmenu);
-  SDL_Flip(sdlVideo);
+  my_SDL_Flip(sdlVideo);
   Ec[0].Cls(fmenu);
   
   // Prend les evenements
@@ -953,7 +970,7 @@ eMenu Menu::SDLMain_HR(void)
 	if(event.active.gain==1) {
 	  NumEc=0;
 	  Ec[1].Cls(fmenu);
-	  SDL_Flip(sdlVideo);
+	  my_SDL_Flip(sdlVideo);
 	  Ec[0].Cls(fmenu);
 	}
 	break;
@@ -985,6 +1002,7 @@ eMenu Menu::SDLMain_HR(void)
 	  case ' ':
 	  case SDLK_RETURN:
 	  case SDLK_KP_ENTER:
+	  case SDLK_LCTRL:
 	    switch(PyE) {
 	    case 0:
 	      Sons.Play(sEnd);
@@ -1043,7 +1061,7 @@ eMenu Menu::SDLMain_HR(void)
     }
     
     // Echange les buffets video
-    SDL_Flip(sdlVideo);
+    my_SDL_Flip(sdlVideo);
     NumEc=(NumEc+1)&1;
     
   } while(true);
@@ -1081,7 +1099,7 @@ void Menu::Affiche_InGame(void)
   // Efface le fond
   NumEc=0;
   Ec[1].Cls(fmenu);
-  SDL_Flip(sdlVideo);
+  my_SDL_Flip(sdlVideo);
   Ec[0].Cls(fmenu);
 }
 
@@ -1101,7 +1119,7 @@ eMenu Menu::SDLMain_InGame(void)
 	if(event.active.gain==1) {
 	  NumEc=0;
 	  Ec[1].Cls(fmenu);
-	  SDL_Flip(sdlVideo);
+	  my_SDL_Flip(sdlVideo);
 	  Ec[0].Cls(fmenu);
 	}
 	break;
@@ -1124,7 +1142,8 @@ eMenu Menu::SDLMain_InGame(void)
 	    break;    
 	  case ' ':
 	  case SDLK_RETURN:
-	  case SDLK_KP_ENTER:
+//	  case SDLK_KP_ENTER:
+	  case SDLK_LCTRL:
 	    switch(PyE) {
 	    case 0:
 	      return mJeux;
@@ -1157,7 +1176,7 @@ eMenu Menu::SDLMain_InGame(void)
     Sourie.Affiche(NumEc);
     
     // Echange les buffets video
-    SDL_Flip(sdlVideo);
+    my_SDL_Flip(sdlVideo);
     NumEc=(NumEc+1)&1;
     
   } while(true);
@@ -1225,7 +1244,7 @@ eMenu Menu::SDLMain_Score(bool EditScore)
   // Efface le fond
   NumEc=0;
   Ec[1].Cls(fmenu);
-  SDL_Flip(sdlVideo);
+  my_SDL_Flip(sdlVideo);
   Ec[0].Cls(fmenu);
   
   // Prend les evenements
@@ -1238,7 +1257,7 @@ eMenu Menu::SDLMain_Score(bool EditScore)
 	if(event.active.gain==1) {
 	  NumEc=0;
 	  Ec[1].Cls(fmenu);
-	  SDL_Flip(sdlVideo);
+	  my_SDL_Flip(sdlVideo);
 	  Ec[0].Cls(fmenu);
 	}
 	break;
@@ -1253,12 +1272,41 @@ eMenu Menu::SDLMain_Score(bool EditScore)
 	  case SDLK_ESCAPE: // Valide l'entrée
 	  case SDLK_RETURN:
 	  case SDLK_KP_ENTER:
+	  case SDLK_LCTRL:
 	    return mMenu;
+	  case SDLK_LEFT:
 	  case SDLK_BACKSPACE: // Fait un retour de chariot
 	    if(PosCur) {
 	      PosCur--;
 	      Pref.Sco[NEdit].Name[PosCur]=0;
 	    }
+#ifdef GCWZERO
+//        add up/down to scroll letters
+	  case SDLK_UP:
+		if (mykey < 36) mykey++;
+		else mykey=0;
+	    	if(PosCur<79) {
+	     		Pref.Sco[NEdit].Name[PosCur]=alphabet[mykey];
+	      		Pref.Sco[NEdit].Name[PosCur+1]=0;
+	    	}
+		break;
+	  case SDLK_DOWN:
+		if (mykey > 0) mykey--;
+		else mykey=36;
+	    	if(PosCur<79) {
+	     		Pref.Sco[NEdit].Name[PosCur]=alphabet[mykey];
+	      		Pref.Sco[NEdit].Name[PosCur+1]=0;
+	    	}
+		break;
+#endif
+	case SDLK_RIGHT:
+	    	if(PosCur<79) {
+		        if(LongueurString(Pref.Sco[NEdit].Name)<LSCOREMAX) PosCur++;
+		      	else Pref.Sco[NEdit].Name[PosCur]=0; // Ne valide pas le caracataire
+	     		Pref.Sco[NEdit].Name[PosCur]=alphabet[mykey];
+	      		Pref.Sco[NEdit].Name[PosCur+1]=0;
+	    	}
+
 	    break;
 	  default: // Prend les touches
 	    key=event.key.keysym.unicode&0x7F; // Prend le caracataire correspondant à la touche
@@ -1301,7 +1349,7 @@ eMenu Menu::SDLMain_Score(bool EditScore)
     }
   
     // Echange les buffets video
-    SDL_Flip(sdlVideo);
+    my_SDL_Flip(sdlVideo);
     NumEc=(NumEc+1)&1;
     
   } while(true);
