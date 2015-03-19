@@ -16,4 +16,4 @@ Full-featured,
 - 3 beautiful musics and many sound effects.
 
 COMPILE INSTRUCTIONS
-sh ./gcw0-buildscript.sh
+sh ./gcw0buildscript.sh
