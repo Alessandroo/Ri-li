@@ -16,4 +16,4 @@ Full-featured,
 - 3 beautiful musics and many sound effects.
 
 INSTALL INSTRUCTIONS
-./configure -DGCWZERO
+./configure --host=mipsel/linux --prefix=/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr CXXFLAGS="-DGCWZERO"
